@@ -1,13 +1,9 @@
 <?php
 
-//require_once './conf/Conf.php';
-$host = "localhost";
-$username="view";
-$password="V13wdata";
-$database="seedstor";
-$connection = new mysqli($host, $username, $password, $database);
 
-if (!$connection) {
+require_once './conf/DBconnect.php';
+
+if (!$dbcnx) {
     echo "error connecting";
 }
 
@@ -18,9 +14,16 @@ if (mysqli_connect_errno())
     echo "Failed to connect to MySQL: " . mysqli_connect_error();
 }
 
-$query = "SELECT * FROM plant WHERE AccessionName LIKE '" . $_GET["accessionname"] . "'";
 
-if ($result = $connection->query($query)) {
+if(isset($_GET['accessionname'])) {
+    $accessionname = filter_input(INPUT_GET, 'accessionname');
+}
+
+global $dbcnx;
+$query = "SELECT * FROM plant WHERE AccessionName LIKE '$accessionname'";
+echo $query;
+
+if ($result = $dbcnx->query($query)) {
 
     $rows = array();
     while($r = mysqli_fetch_assoc($result)) {
@@ -32,5 +35,5 @@ if ($result = $connection->query($query)) {
     $result->close();
 }
 
-$connection->close();
+$dbcnx->close();
 ?>

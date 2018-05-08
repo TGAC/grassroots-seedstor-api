@@ -1,13 +1,9 @@
 <?php
 
-//require_once './conf/Conf.php';
-$host = "localhost";
-$username="view";
-$password="V13wdata";
-$database="seedstor";
-$connection = new mysqli($host, $username, $password, $database);
+//Database connection Module
+require_once './conf/DBconnect.php';
 
-if (!$connection) {
+if (!$dbcnx) {
     echo "error connecting";
 }
 
@@ -17,10 +13,16 @@ if (mysqli_connect_errno())
 {
     echo "Failed to connect to MySQL: " . mysqli_connect_error();
 }
+global $dbcnx;
 
-$query = "SELECT * FROM storeref WHERE StoreCode LIKE '" . $_GET["storecode"] . "'";
+if(isset($_GET['storecode'])) {
+    $storecode = filter_input(INPUT_GET, 'storecode');
+}
 
-if ($result = $connection->query($query)) {
+$query = "SELECT * FROM storeref left join plant on storeref.idPlant=plant.idPlant WHERE storeref.StoreCode LIKE '$storecode'";
+
+
+if ($result = $dbcnx->query($query)) {
 
     $rows = array();
     while($r = mysqli_fetch_assoc($result)) {
@@ -39,5 +41,5 @@ if ($result = $connection->query($query)) {
     $result->close();
 }
 
-$connection->close();
+$dbcnx->close();
 ?>
