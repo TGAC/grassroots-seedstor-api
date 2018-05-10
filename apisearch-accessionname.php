@@ -16,12 +16,11 @@ if (mysqli_connect_errno())
 
 
 if(isset($_GET['accessionname'])) {
-    $accessionname = filter_input(INPUT_GET, 'accessionname');
+    $accessionname = filter_input(INPUT_GET, 'accessionname', FILTER_SANITIZE_STRING);
 }
 
 global $dbcnx;
 $query = "SELECT * FROM plant WHERE AccessionName LIKE '$accessionname'";
-echo $query;
 
 if ($result = $dbcnx->query($query)) {
 
