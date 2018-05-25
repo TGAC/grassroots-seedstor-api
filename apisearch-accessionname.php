@@ -20,7 +20,7 @@ if(isset($_GET['accessionname'])) {
 }
 
 global $dbcnx;
-$query = "SELECT * FROM plant WHERE AccessionName LIKE '$accessionname'";
+$query = "SELECT * FROM plant WHERE lower(AccessionName) LIKE lower('%$accessionname%')";
 
 if ($result = $dbcnx->query($query)) {
 

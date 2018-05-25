@@ -19,7 +19,7 @@ if(isset($_GET['storecode'])) {
     $storecode = filter_input(INPUT_GET, 'storecode', FILTER_SANITIZE_STRING);
 }
 
-$query = "SELECT * FROM storeref left join plant on storeref.idPlant=plant.idPlant WHERE storeref.StoreCode LIKE '$storecode'";
+$query = "SELECT * FROM storeref left join plant on storeref.idPlant=plant.idPlant WHERE lower(storeref.StoreCode) LIKE lower('%$storecode%')";
 
 
 if ($result = $dbcnx->query($query)) {
