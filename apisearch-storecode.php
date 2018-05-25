@@ -3,18 +3,6 @@
 //Database connection Module
 require_once './conf/DBconnect.php';
 
-if (!$dbcnx) {
-    echo "error connecting";
-}
-
-
-
-if (mysqli_connect_errno())
-{
-    echo "Failed to connect to MySQL: " . mysqli_connect_error();
-}
-global $dbcnx;
-
 if(isset($_GET['storecode'])) {
     $storecode = filter_input(INPUT_GET, 'storecode', FILTER_SANITIZE_STRING);
 }
