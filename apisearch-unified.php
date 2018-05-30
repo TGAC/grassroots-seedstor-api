@@ -14,7 +14,7 @@ $id = (int)$query;
 $query2 = "SELECT idPlant FROM storeref left join plant on storeref.idPlant=plant.idPlant WHERE lower(storeref.StoreCode) LIKE lower('%$query%')";
 
 $query1="SELECT plant.idPlant, plant.SubCollection, plant.AccessionName, StoreCode, Genus, Species, SubTaxa, Pedigree, GROUP_CONCAT(Synonym) as Synonyms, 
-  donor.Name as DonorName, breeder.Name as BreederName, SampStatDesc, Country, SowSeason, AccYear, CollSite, PhenotypeParameter, PhenotypeValue, PhenotypeDescribedBy
+  donor.Name as DonorName, breeder.Name as BreederName, SampStatDesc, Country, SowSeason, AccYear, CollSite
 						FROM `plant`  
 						JOIN `taxon` ON plant.idTaxon=taxon.idTaxon
 						LEFT JOIN `pedigree` ON plant.idPedigree=pedigree.idPedigree
@@ -25,7 +25,6 @@ $query1="SELECT plant.idPlant, plant.SubCollection, plant.AccessionName, StoreCo
 						LEFT JOIN `codesampstat` ON plant.SampStat =codesampstat.SampStat
 						LEFT JOIN `codecountry` ON plant.OriginCountry =codecountry.CountryCode
 						LEFT JOIN `storeref` ON plant.idPlant=storeref.idPlant
-						LEFT JOIN `phenotype` ON plant.idPlant=phenotype.idPlant
 						WHERE (plant.idPlant=$id) OR (lower(plant.AccessionName) LIKE lower('%$query%'))
 						GROUP BY plant.idPlant";
 
@@ -36,6 +35,14 @@ $rows2 = array();
 
 if ($result1 = $dbcnx->query($query1)) {
     while($r1 = mysqli_fetch_assoc($result1)) {
+        $r1['phenotype'] = array();
+        $this_idPlant = $r1['idPlant'];
+        $phototype_query = "SELECT PhenotypeParameter, PhenotypeValue, PhenotypeDescribedBy from phenotype WHERE idPlant=$this_idPlant";
+        if ($result_phenotype = $dbcnx->query($phototype_query)) {
+            while($r_phenotype = mysqli_fetch_assoc($result_phenotype)) {
+                $r1['phenotype'][] = $r_phenotype;
+            }
+        }
         $rows1[] = $r1;
     }
     $result1->close();
