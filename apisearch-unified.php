@@ -12,7 +12,7 @@ $query2 = "SELECT storeref.idPlant FROM storeref left join plant on storeref.idP
 
 
 $rows1 = array();
-$rows1[] = getPlantData($query);
+$rows1 = getPlantData($query);
 if ($rows1[0]==""){
 
     $rows1 = array();
@@ -76,7 +76,7 @@ function getPlantData($search_text){
                 }
                 $r1['donnorAddress'] = getAddress($idDonor);
                 $r1['breederAddress'] = getAddress($idBreeder);
-                $tt = $r1;
+                $tt[] = $r1;
         }
         if (!empty($tt)){
             return $tt;
