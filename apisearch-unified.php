@@ -7,7 +7,7 @@ if(isset($_GET['query'])) {
     $query = filter_input(INPUT_GET, 'query', FILTER_SANITIZE_STRING);
 }
 
-$query2 = "SELECT idPlant FROM storeref left join plant on storeref.idPlant=plant.idPlant WHERE lower(storeref.StoreCode) LIKE lower('%$query%')";
+$query2 = "SELECT storeref.idPlant FROM storeref left join plant on storeref.idPlant=plant.idPlant WHERE lower(storeref.StoreCode) LIKE lower('%$query%')";
 
 
 
@@ -25,14 +25,18 @@ $row_ids = array();
 if ($result2 = $dbcnx->query($query2)) {
     while($r2 = mysqli_fetch_assoc($result2)) {
         $row_ids[] = $r2;
-        echo $row_ids;
     }
     $result2->close();
+    foreach($row_ids as $key => $value){
+        array_push($rows2, getPlantData($value));
+    }
+
 
 }
 $rows = $rows1 + $rows2;
+//echo json_encode($row_ids);
 //echo json_encode($rows2);
-print json_encode($rows1);
+print json_encode($rows);
 
 
 function getPlantData($search_text){
