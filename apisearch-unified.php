@@ -74,7 +74,7 @@ function getPlantData($search_text){
                         $r1['phenotype'][] = $r_phenotype;
                     }
                 }
-                $r1['donnorAddress'] = getAddress($idDonor);
+                $r1['donorAddress'] = getAddress($idDonor);
                 $r1['breederAddress'] = getAddress($idBreeder);
                 $tt[] = $r1;
         }
