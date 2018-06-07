@@ -76,6 +76,8 @@ function getPlantData($search_text){
                 }
                 $r1['donorAddress'] = getAddress($idDonor);
                 $r1['breederAddress'] = getAddress($idBreeder);
+                unset($r1['idBreeder']);
+                unset($r1['idDonor']);
                 $tt[] = $r1;
         }
         if (!empty($tt)){
