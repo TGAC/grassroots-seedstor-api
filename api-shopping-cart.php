@@ -41,18 +41,6 @@ $selfURL = filter_var($_SERVER['PHP_SELF'], FILTER_SANITIZE_SPECIAL_CHARS);
 		}
 
 
-if(!isset($_COOKIE['SeedStorCart'])) 	{		
-		$Cart = "No lines have yet been selected";	
-		$Action="None";
-}
-elseif($_COOKIE['SeedStorCart'] =='')	{		
-		$Cart = "No lines have yet been selected";	
-		$Action="None";			
-}
-elseif($_COOKIE["SeedStorCart"] == 'Delete') {
-		$CART="No lines have yet been selected";
-}
-else 	{		
 		$CART = filter_input(INPUT_COOKIE, 'SeedStorCart', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW);
 		//If first character is , then remove it
 		if (substr($CART, 0, 1) === ',') {
@@ -69,7 +57,7 @@ else 	{
 		//Export tidied Shopping Cart
 		setcookie("SeedStorCart", $TidyLines, time()+3600);  /* expire in 1 hour */
 		$Action="EditLines";
-}
+
 
 
 //If form posted
