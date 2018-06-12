@@ -41,6 +41,8 @@ if ($result = $dbcnx->query($query)) {
 
         $r1['donorAddress'] = getAddress($idDonor);
         $r1['breederAddress'] = getAddress($idBreeder);
+        unset($r1['idBreeder']);
+        unset($r1['idDonor']);
         $rows[] = $r;
     }
     print json_encode($rows);
