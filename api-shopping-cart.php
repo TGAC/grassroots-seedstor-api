@@ -26,39 +26,41 @@ session_start();
     require_once './conf/DBconnect.php';
     //Global Settings Module
     require_once './conf/Conf.php';
-    $idPlant = filter_input(INPUT_GET, 'plantid', FILTER_SANITIZE_STRING);
-    // Self URL referrer for form
-    $selfURL = filter_var($_SERVER['PHP_SELF'], FILTER_SANITIZE_SPECIAL_CHARS);
-    if (isset($_COOKIE["SeedStorCart"])) {
-        $CART = filter_input(INPUT_COOKIE, 'SeedStorCart', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW);
-        $NewCart = $idPlant . "," . $CART;
-        $NewCart = $idPlant . "," . $CART;
-    } else {
-        $NewCart = $idPlant;
-    }
-    setcookie("SeedStorCart", $NewCart, time() + 3600);  /* expire in 1 hour */
-
-
-    $CART = filter_input(INPUT_COOKIE, 'SeedStorCart', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW);
+    $plantid = filter_input(INPUT_GET, 'plantid', FILTER_SANITIZE_STRING);
+//    // Self URL referrer for form
+//    $selfURL = filter_var($_SERVER['PHP_SELF'], FILTER_SANITIZE_SPECIAL_CHARS);
+//    if (isset($_COOKIE["SeedStorCart"])) {
+//        $CART = filter_input(INPUT_COOKIE, 'SeedStorCart', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW);
+//        $NewCart = $plantid . "," . $CART;
+//        $NewCart = $plantid . "," . $CART;
+//    } else {
+//        $NewCart = $plantid;
+//    }
+//    setcookie("SeedStorCart", $NewCart, time() + 3600);  /* expire in 1 hour */
+//
+//
+//    $CART = filter_input(INPUT_COOKIE, 'SeedStorCart', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW);
 //    If first character is , then remove it
-    if (substr($CART, 0, 1) === ',') {
-        $CART = substr($CART, 1);
-    }
-    //Check Lines accessions are unique
-    $LineArray = array();
-    $LineArray = explode(",", $CART);
-    //Create a unique ordered array list
-    sort($LineArray);
-    $UniqueLineArray = array();
-    $UniqueLineArray = array_unique($LineArray);
-    $TidyLines = implode(',', $UniqueLineArray);
+//    if (substr($CART, 0, 1) === ',') {
+//        $CART = substr($CART, 1);
+//    }
+//    //Check Lines accessions are unique
+//    $LineArray = array();
+//    $LineArray = explode(",", $CART);
+//    //Create a unique ordered array list
+//    sort($LineArray);
+//    $UniqueLineArray = array();
+//    $UniqueLineArray = array_unique($LineArray);
+//    $TidyLines = implode(',', $UniqueLineArray);
+//    echo json_encode($TidyLines);
     //Export tidied Shopping Cart
-    setcookie("SeedStorCart", $TidyLines, time() + 3600);  /* expire in 1 hour */
+//    setcookie("SeedStorCart", $TidyLines, time() + 3600);  /* expire in 1 hour */
 //    $Action = "EditLines";
+    $TidyLines = $plantid;
+    $Chargeable = "No";
 
-
-    $Chargeable = filter_input(INPUT_GET, 'plantid', FILTER_SANITIZE_STRING);
     $Action = "Checkout";
+//    Checkout($CART, $TidyLines, $Chargeable);
 
 
     if($_SERVER['REQUEST_METHOD'] == "POST")  {
