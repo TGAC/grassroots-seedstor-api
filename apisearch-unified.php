@@ -1,6 +1,6 @@
 <?php
 
-
+header('Content-Type: application/json');
 require_once './conf/DBconnect.php';
 
 if(isset($_GET['query'])) {
