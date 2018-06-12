@@ -38,7 +38,6 @@ $selfURL = filter_var($_SERVER['PHP_SELF'], FILTER_SANITIZE_SPECIAL_CHARS);
 				$NewCart=$idPlant;
 		}
 		setcookie("SeedStorCart", $NewCart, time()+3600);  /* expire in 1 hour */
-		}
 
 
 		$CART = filter_input(INPUT_COOKIE, 'SeedStorCart', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW);
