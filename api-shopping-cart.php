@@ -28,7 +28,7 @@ session_start();
     require_once './conf/Conf.php';
     $plantid = filter_input(INPUT_GET, 'plantid', FILTER_SANITIZE_STRING);
 //    // Self URL referrer for form
-//    $selfURL = filter_var($_SERVER['PHP_SELF'], FILTER_SANITIZE_SPECIAL_CHARS);
+    $selfURL = filter_var($_SERVER['PHP_SELF'], FILTER_SANITIZE_SPECIAL_CHARS);
 //    if (isset($_COOKIE["SeedStorCart"])) {
 //        $CART = filter_input(INPUT_COOKIE, 'SeedStorCart', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW);
 //        $NewCart = $plantid . "," . $CART;
