@@ -20,53 +20,187 @@ session_start();
     <!-- Load jquery for JavaScript functions -->
     <script type='text/javascript' src='./js/jquery-1.7.1.js'></script>
     <?php
-//Navigation Bar Module
-require_once './conf/NavBar.php';
-//Database connection Module 
-require_once './conf/DBconnect.php'; 
-//Global Settings Module
-require_once './conf/Conf.php'; 
-
-// Self URL referrer for form 
-$selfURL = filter_var($_SERVER['PHP_SELF'], FILTER_SANITIZE_SPECIAL_CHARS);
-		if(isset($_COOKIE["SeedStorCart"])) {
-				$CART = filter_input(INPUT_COOKIE, 'SeedStorCart', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW);
-				$NewCart=$idPlant.",".$CART;
-				$NewCart=$idPlant.",".$CART;
-		}
-		else {
-				$NewCart=$idPlant;
-		}
-		setcookie("SeedStorCart", $NewCart, time()+3600);  /* expire in 1 hour */
-
-
-		$CART = filter_input(INPUT_COOKIE, 'SeedStorCart', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW);
-		//If first character is , then remove it
-		if (substr($CART, 0, 1) === ',') {
-				$CART = substr($CART, 1);
-		}
-		//Check Lines accessions are unique
-		$LineArray = array();
-		$LineArray = explode(",",$CART);		
-		//Create a unique ordered array list
-		sort ($LineArray);
-		$UniqueLineArray = array();
-		$UniqueLineArray = array_unique($LineArray);
-		$TidyLines= implode(',', $UniqueLineArray);
-		//Export tidied Shopping Cart
-		setcookie("SeedStorCart", $TidyLines, time()+3600);  /* expire in 1 hour */
-		$Action="EditLines";
+    //Navigation Bar Module
+    require_once './conf/NavBar.php';
+    //Database connection Module
+    require_once './conf/DBconnect.php';
+    //Global Settings Module
+    require_once './conf/Conf.php';
+    $idPlant = filter_input(INPUT_GET, 'plantid', FILTER_SANITIZE_STRING);
+    // Self URL referrer for form
+    $selfURL = filter_var($_SERVER['PHP_SELF'], FILTER_SANITIZE_SPECIAL_CHARS);
+    if (isset($_COOKIE["SeedStorCart"])) {
+        $CART = filter_input(INPUT_COOKIE, 'SeedStorCart', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW);
+        $NewCart = $idPlant . "," . $CART;
+        $NewCart = $idPlant . "," . $CART;
+    } else {
+        $NewCart = $idPlant;
+    }
+    setcookie("SeedStorCart", $NewCart, time() + 3600);  /* expire in 1 hour */
 
 
+    $CART = filter_input(INPUT_COOKIE, 'SeedStorCart', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW);
+//    If first character is , then remove it
+    if (substr($CART, 0, 1) === ',') {
+        $CART = substr($CART, 1);
+    }
+    //Check Lines accessions are unique
+    $LineArray = array();
+    $LineArray = explode(",", $CART);
+    //Create a unique ordered array list
+    sort($LineArray);
+    $UniqueLineArray = array();
+    $UniqueLineArray = array_unique($LineArray);
+    $TidyLines = implode(',', $UniqueLineArray);
+    //Export tidied Shopping Cart
+    setcookie("SeedStorCart", $TidyLines, time() + 3600);  /* expire in 1 hour */
+//    $Action = "EditLines";
 
-//If form posted
-if($_SERVER['REQUEST_METHOD'] == "GET")  {
-				$Chargeable = filter_input(INPUT_GET, 'plantid', FILTER_SANITIZE_STRING);
-				$Action="Checkout";
 
-	
-}
-?>
+    $Chargeable = filter_input(INPUT_GET, 'plantid', FILTER_SANITIZE_STRING);
+    $Action = "Checkout";
+
+
+    if($_SERVER['REQUEST_METHOD'] == "POST")  {
+        /// ---------------------------------------------------------------- EMPTY  ----------------------------------------------------------------
+        if(isset($_POST['EMPTY'])) {
+            setcookie("SeedStorCart", "Delete", 1);  /* expire at start of Epoch time */
+            $Action="Empty";
+        }
+        /// ------------------------------------------------------------- END EMPTY  -------------------------------------------------------------
+
+        /// ---------------------------------------------------------------- REMOVE  ----------------------------------------------------------------
+        if(isset($_POST['REMOVE'])) {
+            $idPlant = filter_input(INPUT_POST, 'idPlant', FILTER_SANITIZE_NUMBER_INT);
+            $UniqueLineArray = array_diff($UniqueLineArray, array($idPlant));
+            $TidyLines= implode(',', $UniqueLineArray);
+            setcookie("SeedStorCart", $TidyLines, time()+3600);  /* expire in 1 hour */
+            $Action="EditLines";
+            echo "<script>window.location='$selfURL'</script>";
+        }
+        /// ------------------------------------------------------------- END REMOVE  -------------------------------------------------------------
+
+        /////===================== DISPATCHEMAIL  ========================================
+        if(isset($_POST['DISPATCHEMAIL'])) {
+            $Chargeable = filter_input(INPUT_POST, 'Chargeable', FILTER_SANITIZE_STRING,  FILTER_FLAG_STRIP_LOW);
+            $Name = filter_input(INPUT_POST, 'Name', FILTER_SANITIZE_STRING,  FILTER_FLAG_STRIP_LOW);
+            $Address = filter_input(INPUT_POST, 'Address', FILTER_SANITIZE_STRING);
+            $Email = filter_input(INPUT_POST, 'Email', FILTER_SANITIZE_EMAIL);
+            $Comments = filter_input(INPUT_POST, 'Comments', FILTER_SANITIZE_STRING);
+            $IntendedUse = filter_input(INPUT_POST, 'IntendedUse', FILTER_SANITIZE_STRING,  FILTER_FLAG_STRIP_LOW);
+            $IntendedUseDesc = filter_input(INPUT_POST, 'IntendedUseDesc', FILTER_SANITIZE_STRING);
+
+            // data validation
+            $errcount=0;
+            // check that essentials filled are completed
+            if ($Name == '')  {
+                $error = 'ERROR: A Name is required';
+                $errcount=$errcount+1;
+            }
+            if (!filter_var($Email, FILTER_VALIDATE_EMAIL)) {
+                $error = 'ERROR: A valid email address is required';
+                $errcount=$errcount+1;
+            }
+            if ($Address == '')  {
+                $error = 'ERROR: An Address is required';
+                $errcount=$errcount+1;
+            }
+            if ($IntendedUse == 'Pick')  {
+                $error = 'ERROR: Please select a suitable category for the intended use';
+                $errcount=$errcount+1;
+            }
+            if ($IntendedUseDesc == '')  {
+                $error = 'ERROR: Please provide a descriptive text for the intended use of these seeds';
+                $errcount=$errcount+1;
+            }
+
+            // If errors then display error message and reload form with data entered so far
+            if($errcount>0) {
+                $Action="Checking";
+            }
+            else {
+                $Address =  nl2br ( $Address);   //Capture new lines in address
+
+                $MyQuery2="	SELECT plant.idPlant, AccessionName, storeref.StoreCode, plant.SubCollection, `idCollection`
+													FROM plant 
+													JOIN storeref ON storeref.idPlant= plant.idPlant 
+													WHERE plant.idPlant IN($TidyLines)";
+
+                //Run MySQL Query on $MyQuery output to Result B
+                $resultB = $dbcnx->query($MyQuery2) or trigger_error("<div class='alert alert-danger'><strong>Error with MySQL Query: </strong>$MyQuery2</br><strong>Error Message:</strong> ". mysqli_error($dbcnx), E_USER_ERROR). "</div>";
+                $rowcount=mysqli_num_rows($resultB);
+
+                $CollSourcesArray = array();
+                $AccNamesArray = array();
+                $LineCostsTotal = 0;
+
+                while($row = $resultB->fetch_assoc()) {
+                    $idPlant = $row['idPlant'];
+                    $CollSourcesArray[] = $row['SubCollection'];
+                    $AccessionName = $row['AccessionName'];
+                    $StoreCode = $row['StoreCode'];
+                    $idCollection = $row['idCollection'];
+
+                    $AccNamesArray[] = "$AccessionName ($StoreCode)";
+
+                    // Get CollectioncostRecovery Amount
+                    $MyQuery3="	SELECT  idCollection, sum(`CostAmount`) as LineCost
+															FROM  collectioncostrecovery 
+															WHERE (idCollection = '$idCollection')
+															AND `CostMethod` = 'Per Line' and `DefaultCost` = 'Yes'
+															GROUP BY idCollection";
+
+                    //Run MySQL Query on $MyQuery output to Result B
+                    $resultC = $dbcnx->query($MyQuery3) or trigger_error("<div class='alert alert-danger'><strong>Error with MySQL Query: </strong>$MyQuery3</br><strong>Error Message:</strong> ". mysqli_error($dbcnx), E_USER_ERROR). "</div>";
+                    while($row = $resultC->fetch_assoc()) {
+                        $LineCost = $row['LineCost'];
+
+                        $LineCostsTotal = $LineCostsTotal + $LineCost;
+                    }
+                }
+
+                // Get CollectioncostRecovery per Job costs
+                $MyQuery4="	SELECT  idCollection, sum(`CostAmount`) as LineCost
+													FROM  collectioncostrecovery 
+													WHERE (idCollection = '$idCollection')
+													AND `CostMethod` = 'Per Job' and `DefaultCost` = 'Yes'
+													GROUP BY idCollection";
+
+                //Run MySQL Query on $MyQuery output to Result B
+                $resultD = $dbcnx->query($MyQuery4) or trigger_error("<div class='alert alert-danger'><strong>Error with MySQL Query: </strong>$MyQuery4</br><strong>Error Message:</strong> ". mysqli_error($dbcnx), E_USER_ERROR). "</div>";
+                while($row = $resultD->fetch_assoc()) {
+                    $LineCost = $row['LineCost'];
+
+                    $LineCostsTotal = $LineCostsTotal + $LineCost;
+                }
+
+                $AccNames= implode(', ', $AccNamesArray);
+                $CollSourcesArray = array_unique($CollSourcesArray);
+                $CollSources= implode(', ', $CollSourcesArray);
+
+                //Basic Email Module
+                require_once './conf/SMTPmail.php';
+
+                // Message to GRU
+                $message = "<b>Name:</b> $Name </br><b>Address: </b></br>$Address </br><b>Email:</b> $Email </br> <b>Intended Use: </b> $IntendedUse </br>    
+						<b>Intended Use Description: </b> $IntendedUseDesc </br> <b>Comments:  </b></br> $Comments </br>
+						<b>From Collections:  </b>$CollSources </br> <b>Number of Accessions:</b> $rowcount </br>  <b> Accessions:</b> $AccNames </br>  <b> Estimated Cost for Job:</b> &pound; $LineCostsTotal (In addition there may be other charges e.g. Phytosanitary certification)   </br> <b> Requested Lines (idPlant): </b></br> $TidyLines</br>";
+                $subject = "SeedStor - New Seed Request";
+                $rcpt='JIC.GeneticResources@jic.ac.uk';
+
+                NbiSendEmailPlus($subject, $message, $rcpt);
+
+                //Message to Client
+                $message2 = "<b>Name:</b> $Name </br><b>Address: </b>$Address </br><b>Email:</b> $Email </br>  <b>Comments: </b> </br> $Comments </br> <b> Estimated Cost for Job:</b> &pound;$LineCostsTotal (In addition there may be other charges e.g. Phytosanitary certification)   </br><b>Number of Accessions:</b> $rowcount </br>  <b>Accessions: </b>$AccNames </br><p> Please bear with us following Mike Ambrose's recent retirement and other staff changes within the GRU we have not been able to process Seed Requests as quickly as we would hope. The new GRU manager joins us in January 2018 and we hope that the GRU will be back up to speed shortly thereafter.</p>";
+                $subject2 = "SeedStor - Client Email copy of new request";
+                $rcpt2=$Email;
+
+                NbiSendEmailPlus($subject2, $message2, $rcpt2);
+            }
+        }
+
+    }
+    ?>
 </HEAD>
 
 <BODY role="document">
