@@ -29,7 +29,7 @@ if ($result2 = $dbcnx->query($query2)) {
     $result2->close();
     foreach($row_ids as $key => $value){
 //        array_push($rows2, getPlantData($value));
-        $rows2 = $rows2 + getPlantData($value);
+        $rows2 = $rows2 + getPlantData($value['idPlant']);
     }
 
 
