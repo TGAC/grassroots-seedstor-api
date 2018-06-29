@@ -7,7 +7,7 @@ if(isset($_GET['query'])) {
     $query = filter_input(INPUT_GET, 'query', FILTER_SANITIZE_STRING);
 }
 
-$query2 = "SELECT storeref.idPlant FROM storeref left join plant on storeref.idPlant=plant.idPlant WHERE lower(storeref.StoreCode) LIKE lower('%$query%')";
+$query2 = "SELECT storeref.idPlant FROM storeref left join plant on storeref.idPlant=plant.idPlant WHERE lower(storeref.StoreCode) LIKE lower('$query')";
 
 
 
@@ -28,7 +28,8 @@ if ($result2 = $dbcnx->query($query2)) {
     }
     $result2->close();
     foreach($row_ids as $key => $value){
-        array_push($rows2, getPlantData($value));
+//        array_push($rows2, getPlantData($value));
+        $rows2 = $rows2 + getPlantData($value);
     }
 
 
